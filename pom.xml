@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>selevminer</groupId>
+  <artifactId>selevminer</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>SelevMINER</name>
+  <description>This project allows the selection of models by means of evolutionary algorithms and other miners</description>
+  <dependencies>
+  	<dependency>
+	    <groupId>org.uma.jmetal</groupId>
+	    <artifactId>jmetal-core</artifactId>
+	    <version>5.11</version>
+  	</dependency>
+  	<dependency>
+	    <groupId>org.uma.jmetal</groupId>
+	    <artifactId>jmetal-algorithm</artifactId>
+	    <version>5.11</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.uma.jmetal</groupId>
+	    <artifactId>jmetal-lab</artifactId>
+	    <version>5.11</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.uma.jmetal</groupId>
+	    <artifactId>jmetal-example</artifactId>
+	    <version>5.11</version>
+	</dependency>
+  </dependencies>
+</project>

@@ -25,4 +25,6 @@ public interface Miner<AnyProcessModel> {
 	public Integer getNumberOfObjectives();
 	
 	public String getName();
+	
+
 }

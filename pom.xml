@@ -26,5 +26,10 @@
 	    <artifactId>jmetal-example</artifactId>
 	    <version>5.11</version>
 	</dependency>
+	<dependency>
+	    <groupId>org.uma.jmetal</groupId>
+	    <artifactId>jmetal-parallel</artifactId>
+	    <version>5.11</version>
+	</dependency>
   </dependencies>
 </project>

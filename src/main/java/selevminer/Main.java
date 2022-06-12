@@ -3,7 +3,8 @@ package selevminer;
 import java.util.List;
 
 import minerful.concept.ProcessModel;
-import selevminer.model.MinerfulMiner;
+import selevminer.algorithm.MINERfulDistanceCalculator;
+import selevminer.model.MINERfulMiner;
 import selevminer.model.Selevminer;
 
 public class Main {
@@ -11,8 +12,9 @@ public class Main {
 	public static void main(String[] args) {
 		Selevminer<ProcessModel> selevminer = new Selevminer<ProcessModel>();
 		selevminer.logPath = Main.class.getClassLoader().getResource("logs/financial_log.xes").getFile();
-		selevminer.miner = new MinerfulMiner();
-		selevminer.numClusters = 10;
+		selevminer.miner = new MINERfulMiner();
+		selevminer.distanceCalculator = new MINERfulDistanceCalculator();
+		selevminer.numClusters = 5;
 		
 		List<ProcessModel> results = selevminer.selevminerDiscovery(); 
 		
@@ -26,5 +28,7 @@ public class Main {
 			System.out.println("---------------------------------------------");
 			System.out.println("\n");
 		}
+		
+		System.exit(0);
 	}
 }

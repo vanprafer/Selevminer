@@ -14,10 +14,10 @@ import minerful.params.SystemCmdParameters;
 import minerful.postprocessing.params.PostProcessingCmdParameters;
 
 /*
- * MinerfulMiner is an specific type of miner which returns a ProcessModel
+ * MINERfulMiner is an specific type of miner which returns a ProcessModel
  * (class from Minerful)
  */
-public class MinerfulMiner implements Miner<ProcessModel> {
+public class MINERfulMiner implements Miner<ProcessModel> {
 	
 	public ProcessModel discover(File log, List<Double> configParams) {
 		
@@ -30,12 +30,19 @@ public class MinerfulMiner implements Miner<ProcessModel> {
 		inputParams.inputLogFile = log;
 		inputParams.inputLanguage = InputEncoding.xes;
 		
+		// Denormalize parameters
+		Double p0 = denormalizeConfigParam(configParams.get(0), 0);
+		Double p1 = denormalizeConfigParam(configParams.get(1), 1);
+		Double p2 = denormalizeConfigParam(configParams.get(2), 2);
+		Double p3 = denormalizeConfigParam(configParams.get(3), 3);
+		Double p4 = denormalizeConfigParam(configParams.get(4), 4);
+		
 		// Those parameters build the chromosome
-		minerFulParams.branchingLimit = Integer.min(Integer.max(configParams.get(0).intValue(), MinerFulCmdParameters.MINIMUM_BRANCHING_LIMIT), 3);
-		postParams.confidenceThreshold = Double.min(Double.max(configParams.get(1), 0), 1);
-		postParams.cropRedundantAndInconsistentConstraints = configParams.get(2) > 0;
-		postParams.interestFactorThreshold = Double.min(Double.max(configParams.get(3), 0), 1);
-		postParams.supportThreshold = Double.min(Double.max(configParams.get(4), 0), 1);
+		minerFulParams.branchingLimit = Integer.min(Integer.max(p0.intValue(), MinerFulCmdParameters.MINIMUM_BRANCHING_LIMIT), 3);
+		postParams.confidenceThreshold = Double.min(Double.max(p1, 0), 1);
+		postParams.cropRedundantAndInconsistentConstraints = p2 > 0;
+		postParams.interestFactorThreshold = Double.min(Double.max(p3, 0), 1);
+		postParams.supportThreshold = Double.min(Double.max(p4, 0), 1);
 		
 		MinerFulMinerLauncher miFuMiLa = new MinerFulMinerLauncher(inputParams, minerFulParams, postParams, systemParams);
 		
@@ -78,6 +85,13 @@ public class MinerfulMiner implements Miner<ProcessModel> {
 		upperBounds.add(1.0);
 		upperBounds.add(1.0);
 		return upperBounds;
+	}
+	
+	private Double denormalizeConfigParam(Double value, Integer paramIndex) {
+		Double lower = getLowerBounds().get(paramIndex);
+		Double upper = getUpperBounds().get(paramIndex);
+		
+		return value * (upper - lower) + lower;
 	}
 
 	public Integer getNumberOfVariables() {

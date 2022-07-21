@@ -1,24 +1,49 @@
-package selevminer.model;
+package selevminer.algorithm;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import dk.brics.automaton.Automaton;
 import minerful.MinerFulMinerLauncher;
+import minerful.MinerFulOutputManagementLauncher;
 import minerful.concept.ProcessModel;
+import minerful.io.params.OutputModelParameters;
 import minerful.miner.params.MinerFulCmdParameters;
 import minerful.params.InputLogCmdParameters;
 import minerful.params.InputLogCmdParameters.InputEncoding;
 import minerful.params.SystemCmdParameters;
+import minerful.params.ViewCmdParameters;
 import minerful.postprocessing.params.PostProcessingCmdParameters;
+import selevminer.model.PMMiner;
 
 /*
  * MINERfulMiner is an specific type of miner which returns a ProcessModel
  * (class from Minerful)
  */
-public class MINERfulMiner implements Miner<ProcessModel> {
+public class MINERfulMiner implements PMMiner<ProcessModel> {
 	
+	class Task implements Callable<ProcessModel> {
+		
+		MinerFulMinerLauncher miFuMiLa;
+		
+	    public ProcessModel call() throws Exception {	   			
+	        return miFuMiLa.mine();
+	    }
+	}
+	
+	private Integer timeout; 
+	
+	public MINERfulMiner(Integer timeout) {
+		super();
+		this.timeout = timeout;
+	}
+
 	public ProcessModel discover(File log, List<Double> configParams) {
 		
 		// Input parameters for MINERful
@@ -46,9 +71,35 @@ public class MINERfulMiner implements Miner<ProcessModel> {
 		
 		MinerFulMinerLauncher miFuMiLa = new MinerFulMinerLauncher(inputParams, minerFulParams, postParams, systemParams);
 		
-		ProcessModel processModel = miFuMiLa.mine();
-		
-		return processModel;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        // Whenever it executes
+        Task task = new Task();
+        task.miFuMiLa = miFuMiLa;
+        
+        // Async function
+        Future<ProcessModel> future = executor.submit(task);
+        
+        try {
+        	// Definition of maximum time of waiting for discovery process
+        	ProcessModel result = future.get(timeout, TimeUnit.SECONDS);
+            executor.shutdownNow();
+
+        	System.out.println("----------------------------------------------");
+        	System.out.println("Model succesfully calculated!");
+        	System.out.println("----------------------------------------------");
+        	
+        	return result;
+            
+        } catch (Exception e) {
+        	// Whenever the time out passes the limit, we finish the process
+            executor.shutdownNow();
+            
+        	System.out.println("----------------------------------------------");
+            System.out.println("Model calculation aborted!");
+        	System.out.println("----------------------------------------------");
+        	
+        	return null;
+        }
 	}
 
 	// Metrics definition to evaluate the model
@@ -65,6 +116,17 @@ public class MINERfulMiner implements Miner<ProcessModel> {
 		metricList.add((double) (transitions + 1) / (states + 1));
 		
 		return metricList;
+	}
+	
+	public void saveAsCondec(ProcessModel processModelDiscovered, String path) {
+		MinerFulOutputManagementLauncher outputMgt = new MinerFulOutputManagementLauncher();
+		SystemCmdParameters systemParams = new SystemCmdParameters();
+		ViewCmdParameters viewParams = new ViewCmdParameters();
+		OutputModelParameters outParams = new OutputModelParameters();
+		
+		outParams.fileToSaveAsConDec = new File(path);
+		
+		outputMgt.manageOutput(processModelDiscovered, viewParams, outParams, systemParams);
 	}
 
 	public List<Double> getLowerBounds() {

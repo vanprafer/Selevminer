@@ -2,9 +2,9 @@
 <!DOCTYPE log SYSTEM "logger.dtd">
 <log>
 <record>
-  <date>2022-04-28T17:56:40.432163100Z</date>
-  <millis>1651168600432</millis>
-  <nanos>163100</nanos>
+  <date>2022-05-23T07:04:12.191637500Z</date>
+  <millis>1653289452191</millis>
+  <nanos>637500</nanos>
   <sequence>0</sequence>
   <logger>org.uma.jmetal.util.JMetalLogger</logger>
   <level>INFO</level>
@@ -14,9 +14,9 @@
   <message>Loggers configured with null</message>
 </record>
 <record>
-  <date>2022-04-28T17:56:40.495163300Z</date>
-  <millis>1651168600495</millis>
-  <nanos>163300</nanos>
+  <date>2022-05-23T07:04:12.259638600Z</date>
+  <millis>1653289452259</millis>
+  <nanos>638600</nanos>
   <sequence>1</sequence>
   <logger>org.uma.jmetal.util.JMetalLogger</logger>
   <level>INFO</level>
@@ -25,3 +25,4 @@
   <thread>1</thread>
   <message>rpssize: 6</message>
 </record>
+</log>

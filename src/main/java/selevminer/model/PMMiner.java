@@ -7,7 +7,7 @@ import java.util.List;
  * This interface represents a miner object, which is defined as an object that can discover
  * a process model (of class AnyProcessModel) from a log and some parameters
  * */
-public interface Miner<AnyProcessModel> {
+public interface PMMiner<AnyProcessModel> {
 
 	public AnyProcessModel discover(File log, List<Double> chromosome);
 	

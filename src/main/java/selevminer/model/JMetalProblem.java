@@ -3,30 +3,24 @@ package selevminer.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.uma.jmetal.problem.doubleproblem.impl.AbstractDoubleProblem;
 import org.uma.jmetal.solution.doublesolution.DoubleSolution;
 
 // Optimization problem for JMetal library (this is required)
-public class SelevminerProblem<AnyProcessModel> extends AbstractDoubleProblem {
+public class JMetalProblem<AnyProcessModel> extends AbstractDoubleProblem {
 	
 	private static final long serialVersionUID = 1L;
 	private File log;
-	private Miner<AnyProcessModel> miner;
+	private PMMiner<AnyProcessModel> miner;
 	// Size of the chromosome (in evolutionary algorithm terms) or number of configuration parameters (for the discovery algorithm)
 	private Integer numberOfVariables;
 	// Size of the fitness array (evolutionary algorithm) or number of metrics to evaluate a process model (discovery algorithm)
 	private Integer numberOfObjectives;
 	private Integer numberOfConstraints;
 	private String name;
-	private Integer timeout; 
 
-	public SelevminerProblem(File log, Miner<AnyProcessModel> miner, Integer timeout) {
+	public JMetalProblem(File log, PMMiner<AnyProcessModel> miner) {
 		super();
 		this.log = log;
 		this.miner = miner;
@@ -34,7 +28,6 @@ public class SelevminerProblem<AnyProcessModel> extends AbstractDoubleProblem {
 		this.numberOfVariables = miner.getNumberOfVariables();
 		this.numberOfConstraints = miner.getNumberOfConstraints();
 		this.name = miner.getName();
-		this.timeout = timeout;
 
 		List<Double> lowerBounds = new ArrayList<Double>();
 		List<Double> upperBounds = new ArrayList<Double>();
@@ -64,55 +57,28 @@ public class SelevminerProblem<AnyProcessModel> extends AbstractDoubleProblem {
 		return this.name;
 	}
 	
-	class Task implements Callable<List<Double>> {
-		
-		DoubleSolution solution;
-		
-	    public List<Double> call() throws Exception {	    	
-			AnyProcessModel processModel = miner.discover(log, solution.variables());
-			List<Double> fitness = miner.metrics(processModel);
-			
-	        return fitness;
-	    }
-	}
+
 
 	// Take an unevaluated chromosome, calculate its fitness (metrics via discovery algorithm) and store it internally to avoid recomputing it 
 	public DoubleSolution evaluate(DoubleSolution solution) {
-
+		
+		// Discover gets the log and the chromosome
+		AnyProcessModel pm = miner.discover(log, solution.variables());
 		List<Double> fitness = new ArrayList<Double>();
 		
-		// Executes discovery algorithm
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        // Whenever it executes
-        Task task = new Task();
-        task.solution = solution;
-        
-        // Async function
-        Future<List<Double>> future = executor.submit(task);
-        
-        try {
-        	// Definition of maximum time of waiting for discovery process
-        	fitness = future.get(timeout, TimeUnit.SECONDS);
-            executor.shutdownNow();
-
-        	System.out.println("----------------------------------------------");
-        	System.out.println("Calculated succesfully!");
-        	System.out.println("----------------------------------------------");
-            
-        } catch (Exception e) {
-        	// Whenever the time out passes the limit, we finish the process
-            executor.shutdownNow();
-            
-        	System.out.println("----------------------------------------------");
-            System.out.println("Aborted calculation");
-        	System.out.println("----------------------------------------------");
-
-            // Adding zeros into fitness list because we consider that the PM discovery is too slow
+		if(pm == null) {
+            // Adding big numbers into fitness list because we consider that the PM discovery is too slow
             for(int i=0; i<this.getNumberOfObjectives(); i++) {
+            	// We provide a bad fitness for metrics in order to represent that a model that cannot be discovered is bad
+            	// A bad fitness makes sure that the chromosome will not reproduce
             	fitness.add(17000.);
             }
-        }
-        
+        } else {
+			fitness = miner.metrics(pm);
+		}
+		
+		System.out.println("The current chromosome is: " + solution.variables());
+		        
 		// Store the list inside the internal array 
 		for (int i=0; i<fitness.size(); i++) {
 			solution.objectives()[i] = fitness.get(i);

@@ -20,10 +20,10 @@ public class Main {
 		// NOTE: ProcessModel exists in MINERful library, but AnyProcessModel is just a template in order to extend Selevminer
 		
 		// We define the Selevminer instance
-		Integer population = 10;
+		Integer population = 15;
 		Integer generations = 10;
 		Integer timeout = 20;
-		Integer cores = 2;
+		Integer cores = 4;
 		
 		Selevminer<ProcessModel> selevminer = new Selevminer<ProcessModel>();
 		selevminer.miner = new MINERfulMiner(timeout);
@@ -40,7 +40,7 @@ public class Main {
 		System.out.println("Process models returned: " + results.size());
 		
 		Integer i = 1;
-		String folderName = population + "p_" + generations + "g_" + timeout + "t";
+		String folderName = population + "p_" + generations + "g_" + timeout + "t_" + selevminer.numSolutions + "s";
 		String path = "C:/Users/Vanessa/Desktop/modelos/Experimentacion Selevminer/" + folderName + "/";
 		
 		if (!new File(path).mkdirs()) {

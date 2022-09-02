@@ -8,9 +8,9 @@ import java.util.List;
 import minerful.concept.ProcessModel;
 import selevminer.algorithm.MINERfulDistanceCalculator;
 import selevminer.algorithm.MINERfulMiner;
+import selevminer.algorithm.NSGAIIEvolutionaryOptimizer;
 import selevminer.algorithm.RandomPMSelection;
 import selevminer.algorithm.SingleLinkageAgglomerativeClusterer;
-import selevminer.model.NSGAIIEvolutionaryOptimizer;
 import selevminer.model.Selevminer;
 
 public class Main {
@@ -20,9 +20,9 @@ public class Main {
 		// NOTE: ProcessModel exists in MINERful library, but AnyProcessModel is just a template in order to extend Selevminer
 		
 		// We define the Selevminer instance
-		Integer population = 15;
-		Integer generations = 10;
-		Integer timeout = 20;
+		Integer population = 5;
+		Integer generations = 5;
+		Integer timeout = 10;
 		Integer cores = 4;
 		
 		Selevminer<ProcessModel> selevminer = new Selevminer<ProcessModel>();
@@ -32,8 +32,8 @@ public class Main {
 		selevminer.distanceCalculator = new MINERfulDistanceCalculator();
 		selevminer.evOptimizer = new NSGAIIEvolutionaryOptimizer<ProcessModel>(population, generations, cores);
 
-		selevminer.logPath = Main.class.getClassLoader().getResource("logs/financial_log.xes").getFile();
-		selevminer.numSolutions = 10;	
+		selevminer.logPath = Main.class.getClassLoader().getResource("logs/hospital_log.xes").getFile();
+		selevminer.numSolutions = 5;	
 		
 		List<ProcessModel> results = selevminer.selevminerDiscovery(); 
 		
@@ -41,7 +41,7 @@ public class Main {
 		
 		Integer i = 1;
 		String folderName = population + "p_" + generations + "g_" + timeout + "t_" + selevminer.numSolutions + "s";
-		String path = "C:/Users/Vanessa/Desktop/modelos/Experimentacion Selevminer/" + folderName + "/";
+		String path = "C:/Users/Vanessa/Desktop/modelos/Experimentacion Selevminer 2/" + folderName + "/";
 		
 		if (!new File(path).mkdirs()) {
 			System.err.println("Unable to create path " + path);
@@ -54,6 +54,10 @@ public class Main {
 			FileWriter writer = new FileWriter(path + "Modelo " + i + "_dot.txt");
 			writer.write(pm.buildAutomaton().toDot());
 			writer.close();
+
+			FileWriter writer2 = new FileWriter(path + "Modelo " + i + "_metricas.txt");
+			writer2.write(selevminer.miner.metrics(pm).toString());
+			writer2.close();
 			
 			i ++;
 		}

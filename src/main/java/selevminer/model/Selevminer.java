@@ -1,6 +1,8 @@
 package selevminer.model;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +39,21 @@ public class Selevminer<AnyProcessModel> {
 		File eventLog = new File(logPath); 
 		
 		List<AnyProcessModel> paretoFront = evOptimizer.optimize(eventLog, miner);
+		
+		// Remove duplicates (same metrics)
+		List<AnyProcessModel> filteredParetoFront = new ArrayList<AnyProcessModel>();
+		Set<List<Double>> metrics = new HashSet<List<Double>>();
+		
+		for(AnyProcessModel pm: paretoFront) {
+			List<Double> pmMetrics = miner.metrics(pm);
+			
+			if (!metrics.contains(pmMetrics)) {
+				metrics.add(pmMetrics);
+				filteredParetoFront.add(pm);
+			}
+		}
+		
+		paretoFront = filteredParetoFront;
 		
 		System.out.println("Finished optimization step!!");
 		

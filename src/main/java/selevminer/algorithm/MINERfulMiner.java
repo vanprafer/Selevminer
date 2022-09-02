@@ -10,6 +10,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import dk.brics.automaton.Automaton;
+import dk.brics.automaton.State;
+import dk.brics.automaton.Transition;
 import minerful.MinerFulMinerLauncher;
 import minerful.MinerFulOutputManagementLauncher;
 import minerful.concept.ProcessModel;
@@ -111,11 +113,61 @@ public class MINERfulMiner implements PMMiner<ProcessModel> {
 		Double states = (double) automaton.getNumberOfStates();
 		Double transitions = (double) automaton.getNumberOfTransitions();
 		
-		// Provisional statistics to evaluate the model. Here, states and transitions are confronted 
-		metricList.add((double) (states + 1) / (transitions + 1));
-		metricList.add((double) (transitions + 1) / (states + 1));
+		// Provisional statistics to evaluate the model
+		
+		// Ratios. Here, states and transitions are confronted 
+		metricList.add((states + 1) / (transitions + 1));
+		metricList.add((transitions + 1) / (states + 1));
+
+		// Cyclomatic complexity
+		metricList.add(transitions + states + 2);
+		
+		// Activities
+		metricList.add(states);
+		metricList.add(-states); // We change the sign in order to get the maximum value instead of the minimum
+		
+		// Number of joins and splits
+		List<Double> joinsAndSplits = getNumberOfJoinsAndSplits(automaton);
+		// Minimize
+		metricList.add(joinsAndSplits.get(0));
+		metricList.add(joinsAndSplits.get(1));
+		// Maximize
+		metricList.add(-joinsAndSplits.get(0));
+		metricList.add(-joinsAndSplits.get(1));
 		
 		return metricList;
+	}
+	
+	private List<Double> getNumberOfJoinsAndSplits(Automaton automaton) {
+		
+		List<Double> joinsAndSplits = new ArrayList<Double>();
+		joinsAndSplits.add(0.);
+		joinsAndSplits.add(0.);
+		
+		for(State state: automaton.getStates()) {
+			
+			// Splits
+			if(state.getTransitions().size() > 1) {
+				joinsAndSplits.set(1, joinsAndSplits.get(1) + 1.);
+			}
+			
+			Integer count = 0;
+						
+			for(State state2: automaton.getStates()) {
+				for(Transition transition: state2.getTransitions()) {
+					if(state == transition.getDest()) {
+						count ++;
+					}
+				}
+			}
+			
+			// Joins
+			if(count > 1)  {
+				joinsAndSplits.set(0, joinsAndSplits.get(0) + 1.);
+			}
+		}
+		
+		return joinsAndSplits;
 	}
 	
 	public void saveAsCondec(ProcessModel processModelDiscovered, String path) {
@@ -165,7 +217,7 @@ public class MINERfulMiner implements PMMiner<ProcessModel> {
 	}
 
 	public Integer getNumberOfObjectives() {
-		return 2;
+		return 9;
 	}
 
 	public String getName() {

@@ -5,6 +5,6 @@ import java.util.Set;
 
 public interface PMClusterer<AnyProcessModel> {
 
-	public List<Set<AnyProcessModel>> cluster(List<AnyProcessModel> clusters, Integer objectiveClusters, PMDistanceCalculator<AnyProcessModel> distanceCalculator);
+	public List<Set<PMWrapper<AnyProcessModel>>> cluster(List<PMWrapper<AnyProcessModel>> clusters, Integer objectiveClusters, PMDistanceCalculator<AnyProcessModel> distanceCalculator);
 	
 }

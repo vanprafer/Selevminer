@@ -11,10 +11,13 @@ import org.uma.jmetal.operator.mutation.impl.PolynomialMutation;
 import org.uma.jmetal.parallel.asynchronous.algorithm.impl.AsynchronousMultiThreadedNSGAII;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.doublesolution.DoubleSolution;
+import org.uma.jmetal.solution.doublesolution.impl.DefaultDoubleSolution;
+import org.uma.jmetal.util.observer.impl.PrintObjectivesObserver;
 import org.uma.jmetal.util.termination.impl.TerminationByEvaluations;
 
 import selevminer.model.PMEvolutionaryOptimizer;
 import selevminer.model.PMMiner;
+import selevminer.model.PMWrapper;
 
 public class NSGAIIEvolutionaryOptimizer<AnyProcessModel> implements PMEvolutionaryOptimizer<AnyProcessModel>{
 	
@@ -33,7 +36,7 @@ public class NSGAIIEvolutionaryOptimizer<AnyProcessModel> implements PMEvolution
 	}
 
 	// This method uses the JMetal library in order to obtain a Pareto Front 
-	public List<AnyProcessModel> optimize(File eventLog, PMMiner<AnyProcessModel> miner) {
+	public List<PMWrapper<AnyProcessModel>> optimize(File eventLog, PMMiner<AnyProcessModel> miner) {
 		
 		// Configuration parameters for the evolutionary algorithm
 		Problem<DoubleSolution> problem;
@@ -63,22 +66,16 @@ public class NSGAIIEvolutionaryOptimizer<AnyProcessModel> implements PMEvolution
 			// The next method calculates the number of evaluations for the given number of generations
 			new TerminationByEvaluations(generations*population)
 		);
-			
+		
 		algorithm.run();
 		
 		// Obtaining the Pareto Front (last generation) and applying discovery to each chromosome in order to get a process model for each one
 		List<DoubleSolution> chromosomes = algorithm.getResult();
+		List<PMWrapper<AnyProcessModel>> paretoFront = new ArrayList<PMWrapper<AnyProcessModel>>();
 		
-		List<AnyProcessModel> paretoFront = new ArrayList<AnyProcessModel>();
-		
-		for (DoubleSolution chromosome: chromosomes) {
-			// We discover a PM for each chromosome
-			AnyProcessModel processModel = miner.discover(eventLog, chromosome.variables());
-			
-			// Whenever a model excedes the timeout, we discard it
-			if(processModel != null) {
-				paretoFront.add(processModel);
-			}
+		for(DoubleSolution chromosome: chromosomes) {
+			PMWrapper<AnyProcessModel> pwwrapper = new PMWrapper<AnyProcessModel>((DefaultDoubleSolution) chromosome);
+			paretoFront.add(pwwrapper);
 		}
 		
 		return paretoFront;

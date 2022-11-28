@@ -6,6 +6,6 @@ package selevminer.model;
  * */
 public interface PMDistanceCalculator<AnyProcessModel> {
 
-	public Double distance(AnyProcessModel a, AnyProcessModel b);
+	public Double distance(PMWrapper<AnyProcessModel> a, PMWrapper<AnyProcessModel> b);
 	
 }

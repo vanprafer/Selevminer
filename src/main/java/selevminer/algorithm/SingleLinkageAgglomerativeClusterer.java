@@ -7,15 +7,16 @@ import java.util.Set;
 
 import selevminer.model.PMClusterer;
 import selevminer.model.PMDistanceCalculator;
+import selevminer.model.PMWrapper;
 
 public class SingleLinkageAgglomerativeClusterer<AnyProcessModel> implements PMClusterer<AnyProcessModel>{
 		
 	// This method gets the demanded number clusters
-	public List<Set<AnyProcessModel>> cluster(List<AnyProcessModel> processModels, Integer objectiveClusters,
+	public List<Set<PMWrapper<AnyProcessModel>>> cluster(List<PMWrapper<AnyProcessModel>> processModels, Integer objectiveClusters,
 			PMDistanceCalculator<AnyProcessModel> distanceCalculator) {
 		
 		// We initialize a cluster for each process model
-		List<Set<AnyProcessModel>> clusters = firstClusters(processModels);
+		List<Set<PMWrapper<AnyProcessModel>>> clusters = firstClusters(processModels);
 		
 		// We iterate until we get the demanded number clusters. Each iteration merges two clusters
 		while(objectiveClusters < clusters.size()) {
@@ -45,7 +46,7 @@ public class SingleLinkageAgglomerativeClusterer<AnyProcessModel> implements PMC
 			}
 			
 			// We create a new cluster with the models of the two closest clusters
-			Set<AnyProcessModel> c = clusters.get(indexA);
+			Set<PMWrapper<AnyProcessModel>> c = clusters.get(indexA);
 			c.addAll(clusters.get(indexB));
 			
 			// We need to remove the highest element first
@@ -65,13 +66,13 @@ public class SingleLinkageAgglomerativeClusterer<AnyProcessModel> implements PMC
 	}
 	
 	// This function calculates the mean between each model of two clusters
-	public Double distanceClustersMean(Set<AnyProcessModel> clusterA, Set<AnyProcessModel> clusterB, 
+	public Double distanceClustersMean(Set<PMWrapper<AnyProcessModel>> clusterA, Set<PMWrapper<AnyProcessModel>> clusterB, 
 			PMDistanceCalculator<AnyProcessModel> distanceCalculator) {
 		
 		// This part calculates the sum of all distances between the models of the two clusters
 		Double distance = 0.;
-		for(AnyProcessModel modelA: clusterA) {
-			for(AnyProcessModel modelB: clusterB) {
+		for(PMWrapper<AnyProcessModel> modelA: clusterA) {
+			for(PMWrapper<AnyProcessModel> modelB: clusterB) {
 				distance += distanceCalculator.distance(modelA, modelB);
 			}
 		}
@@ -82,12 +83,12 @@ public class SingleLinkageAgglomerativeClusterer<AnyProcessModel> implements PMC
 	}	
 	
 	// This method initializes the first clusters. One for each element
-	private List<Set<AnyProcessModel>> firstClusters(List<AnyProcessModel> processModels) {
+	private List<Set<PMWrapper<AnyProcessModel>>> firstClusters(List<PMWrapper<AnyProcessModel>> processModels) {
 		
-		List<Set<AnyProcessModel>> firstClusters = new ArrayList<Set<AnyProcessModel>>();
+		List<Set<PMWrapper<AnyProcessModel>>> firstClusters = new ArrayList<Set<PMWrapper<AnyProcessModel>>>();
 		
-		for(AnyProcessModel processModel: processModels) {
-			Set<AnyProcessModel> modelSet = new HashSet<AnyProcessModel>();
+		for(PMWrapper<AnyProcessModel> processModel: processModels) {
+			Set<PMWrapper<AnyProcessModel>> modelSet = new HashSet<PMWrapper<AnyProcessModel>>();
 			modelSet.add(processModel);
 			firstClusters.add(modelSet);
 		}

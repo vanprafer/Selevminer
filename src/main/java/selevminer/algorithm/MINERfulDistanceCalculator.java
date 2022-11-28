@@ -3,6 +3,7 @@ package selevminer.algorithm;
 import dk.brics.automaton.Automaton;
 import minerful.concept.ProcessModel;
 import selevminer.model.PMDistanceCalculator;
+import selevminer.model.PMWrapper;
 
 public class MINERfulDistanceCalculator implements PMDistanceCalculator<ProcessModel> {
 	
@@ -16,12 +17,11 @@ public class MINERfulDistanceCalculator implements PMDistanceCalculator<ProcessM
 		return Math.abs((a - b) / Double.max(a, b));
 	}
 
-	public Double distance(ProcessModel a, ProcessModel b) {
-
-		Automaton autA = a.buildAutomaton();
-		Automaton autB = b.buildAutomaton(); 
+	public Double distance(PMWrapper<ProcessModel> a, PMWrapper<ProcessModel> b) {
+		Automaton autA = ((MINERfulPMWrapper) a).getAutomaton(null, null);
+		Automaton autB = ((MINERfulPMWrapper) b).getAutomaton(null, null); 
 		
-		Double constDiff = scaledDifference((double)a.getAllConstraints().size(), (double)b.getAllConstraints().size());
+		Double constDiff = scaledDifference((double)a.getPm(null, null).getAllConstraints().size(), (double)b.getPm(null, null).getAllConstraints().size());
 		Double stateDiff = scaledDifference((double)autA.getNumberOfStates(), (double)autB.getNumberOfStates());
 		Double transDiff = scaledDifference((double)autA.getNumberOfTransitions(), (double)autB.getNumberOfTransitions());
 		

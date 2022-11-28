@@ -31,5 +31,19 @@
 	    <artifactId>jmetal-parallel</artifactId>
 	    <version>5.11</version>
 	</dependency>
+	
+	<dependency>
+		<groupId>info.clearthought</groupId>
+		<artifactId>table-layout</artifactId>
+		<version>4.3.0</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>guru.nidi</groupId>
+	    <artifactId>graphviz-java</artifactId>
+	    <version>0.18.1</version>
+	</dependency>
+<!-- Thanks for using https://jar-download.com -->
+
   </dependencies>
 </project>

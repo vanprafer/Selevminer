@@ -103,6 +103,7 @@ public class MINERfulMiner implements PMMiner<ProcessModel> {
         	return null;
         }
 	}
+	
 
 	// Metrics definition to evaluate the model
 	public List<Double> metrics(ProcessModel processModelDiscovered) {
@@ -117,14 +118,14 @@ public class MINERfulMiner implements PMMiner<ProcessModel> {
 		
 		// Ratios. Here, states and transitions are confronted 
 		metricList.add((states + 1) / (transitions + 1));
-		metricList.add((transitions + 1) / (states + 1));
+		//metricList.add((transitions + 1) / (states + 1));
 
 		// Cyclomatic complexity
 		metricList.add(transitions + states + 2);
 		
 		// Activities
 		metricList.add(states);
-		metricList.add(-states); // We change the sign in order to get the maximum value instead of the minimum
+		//metricList.add(-states); // We change the sign in order to get the maximum value instead of the minimum
 		
 		// Number of joins and splits
 		List<Double> joinsAndSplits = getNumberOfJoinsAndSplits(automaton);
@@ -132,8 +133,8 @@ public class MINERfulMiner implements PMMiner<ProcessModel> {
 		metricList.add(joinsAndSplits.get(0));
 		metricList.add(joinsAndSplits.get(1));
 		// Maximize
-		metricList.add(-joinsAndSplits.get(0));
-		metricList.add(-joinsAndSplits.get(1));
+		//metricList.add(-joinsAndSplits.get(0));
+		//metricList.add(-joinsAndSplits.get(1));
 		
 		return metricList;
 	}
@@ -217,7 +218,7 @@ public class MINERfulMiner implements PMMiner<ProcessModel> {
 	}
 
 	public Integer getNumberOfObjectives() {
-		return 9;
+		return 5;
 	}
 
 	public String getName() {

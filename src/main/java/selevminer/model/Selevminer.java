@@ -1,6 +1,7 @@
 package selevminer.model;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,47 +30,57 @@ public class Selevminer<AnyProcessModel> {
 
 	// Number of clusters desired to obtain. This is translated into the models 
 	public Integer numSolutions = 7;
-		
+	
 	/*
 	 * This function combines discovery and evolutionary techniques in order to return a list of the optimal models given some metrics.
 	 * This depends on the mining algorithm you have chosen and its metrics
 	 */
-	public List<AnyProcessModel> selevminerDiscovery() {
+	public List<PMWrapper<AnyProcessModel>> selevminerDiscovery(Class<? extends PMWrapper<AnyProcessModel>> wrapperClass) throws Exception {
 		
 		File eventLog = new File(logPath); 
 		
-		List<AnyProcessModel> paretoFront = evOptimizer.optimize(eventLog, miner);
+	    long initTime = System.currentTimeMillis();	
+	    
+		List<PMWrapper<AnyProcessModel>> paretoFront = evOptimizer.optimize(eventLog, miner);
 		
 		// Remove duplicates (same metrics)
-		List<AnyProcessModel> filteredParetoFront = new ArrayList<AnyProcessModel>();
+		List<PMWrapper<AnyProcessModel>> filteredParetoFront = new ArrayList<PMWrapper<AnyProcessModel>>();
 		Set<List<Double>> metrics = new HashSet<List<Double>>();
 		
-		for(AnyProcessModel pm: paretoFront) {
-			List<Double> pmMetrics = miner.metrics(pm);
+		Constructor<? extends PMWrapper<AnyProcessModel>> constructor = wrapperClass.getConstructor(PMWrapper.class);
+		
+		for(PMWrapper<AnyProcessModel> pmwrapper: paretoFront) {
+			List<Double> pmMetrics = pmwrapper.getMetrics(eventLog, miner);
 			
-			if (!metrics.contains(pmMetrics)) {
+			if (!metrics.contains(pmMetrics) && pmMetrics != null) {
 				metrics.add(pmMetrics);
-				filteredParetoFront.add(pm);
+				filteredParetoFront.add(constructor.newInstance(pmwrapper));
 			}
 		}
 		
 		paretoFront = filteredParetoFront;
+	    
+	    long clusterTime = System.currentTimeMillis();
+	    
+		System.out.println("Finished optimization step in " + (clusterTime - initTime) + "ms!!");
 		
-		System.out.println("Finished optimization step!!");
+		List<Set<PMWrapper<AnyProcessModel>>> clusters = clusterer.cluster(paretoFront, numSolutions, distanceCalculator);
 		
-		List<Set<AnyProcessModel>> clusters = clusterer.cluster(paretoFront, numSolutions, distanceCalculator);
-		
-		System.out.println("Finished clustering step!!");
+	    long selectTime = System.currentTimeMillis();
+	    
+		System.out.println("Finished clustering step in " + (selectTime - clusterTime) + "ms!!");
 		
 		// We are looking for a random model from the cluster
 		paretoFront.clear();
 		
 		// We select a PM from each cluster and store it in a list in order to return it
-		for(Set<AnyProcessModel> cluster: clusters) {
+		for(Set<PMWrapper<AnyProcessModel>> cluster: clusters) {
 			paretoFront.add(pmSelector.select(cluster));
 		}
 		
-		System.out.println("Finished selection step!!");
+	    long endTime = System.currentTimeMillis();
+
+	    System.out.println("Finished selection step in " + (endTime - selectTime) + "ms!!");
 		
 		return paretoFront;
 	}

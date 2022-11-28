@@ -58,8 +58,6 @@ public class JMetalProblem<AnyProcessModel> extends AbstractDoubleProblem {
 	public String getName() {
 		return this.name;
 	}
-	
-
 
 	// Take an unevaluated chromosome, calculate its fitness (metrics via discovery algorithm) and store it internally to avoid recomputing it 
 	public DoubleSolution evaluate(DoubleSolution solution) {

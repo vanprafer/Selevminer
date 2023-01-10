@@ -11,6 +11,7 @@ import selevminer.algorithm.MINERfulDistanceCalculator;
 import selevminer.algorithm.MINERfulMiner;
 import selevminer.algorithm.MINERfulPMWrapper;
 import selevminer.algorithm.NSGAIIEvolutionaryOptimizer;
+import selevminer.algorithm.ParticleSwarmOptimizer;
 import selevminer.algorithm.RandomPMSelection;
 import selevminer.algorithm.SingleLinkageAgglomerativeClusterer;
 import selevminer.model.PMWrapper;
@@ -42,7 +43,8 @@ public class Main {
 		selevminer.pmSelector = new RandomPMSelection<ProcessModel>();
 		selevminer.clusterer = new SingleLinkageAgglomerativeClusterer<ProcessModel>();
 		selevminer.distanceCalculator = new MINERfulDistanceCalculator();
-		selevminer.evOptimizer = new NSGAIIEvolutionaryOptimizer<ProcessModel>(population, generations, cores);
+		selevminer.evOptimizer = new ParticleSwarmOptimizer<ProcessModel>(population, generations);
+		// selevminer.evOptimizer = new NSGAIIEvolutionaryOptimizer<ProcessModel>(population, generations, cores);
 
 		selevminer.logPath = Main.class.getClassLoader().getResource(logPath).getFile();
 		selevminer.numSolutions = numSolsArg;	

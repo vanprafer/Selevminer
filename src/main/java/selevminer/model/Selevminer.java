@@ -15,7 +15,7 @@ public class Selevminer<AnyProcessModel> {
 	/* ALGORITHMS */
 	
 	// Evolutionary (multiobjective) optimizer
-	public PMEvolutionaryOptimizer<AnyProcessModel> evOptimizer;
+	public PMOptimizer<AnyProcessModel> evOptimizer;
 	// Tool that contains the architecture for the internal discovery algorithm (for example, MINERful)
 	public PMMiner<AnyProcessModel> miner;	
 	// Clustering algorithm

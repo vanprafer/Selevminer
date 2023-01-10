@@ -15,11 +15,11 @@ import org.uma.jmetal.solution.doublesolution.impl.DefaultDoubleSolution;
 import org.uma.jmetal.util.observer.impl.PrintObjectivesObserver;
 import org.uma.jmetal.util.termination.impl.TerminationByEvaluations;
 
-import selevminer.model.PMEvolutionaryOptimizer;
+import selevminer.model.PMOptimizer;
 import selevminer.model.PMMiner;
 import selevminer.model.PMWrapper;
 
-public class NSGAIIEvolutionaryOptimizer<AnyProcessModel> implements PMEvolutionaryOptimizer<AnyProcessModel>{
+public class NSGAIIEvolutionaryOptimizer<AnyProcessModel> implements PMOptimizer<AnyProcessModel>{
 	
 	// Number of population
 	private Integer population;

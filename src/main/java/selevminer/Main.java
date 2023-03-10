@@ -13,6 +13,8 @@ import selevminer.algorithm.MINERfulPMWrapper;
 import selevminer.algorithm.NSGAIIEvolutionaryOptimizer;
 import selevminer.algorithm.RandomPMSelection;
 import selevminer.algorithm.SingleLinkageAgglomerativeClusterer;
+import selevminer.model.PMClusterer;
+import selevminer.model.PMEvolutionaryOptimizer;
 import selevminer.model.PMWrapper;
 import selevminer.model.Selevminer;
 
@@ -20,23 +22,26 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		
-		// NOTE: ProcessModel exists in MINERful library, but AnyProcessModel is just a template in order to extend Selevminer
-
-		String logPath = args[0];
-		String outPath = args[1];
-		Integer populationArg = Integer.valueOf(args[2]);
-		Integer generationsArg = Integer.valueOf(args[3]);
-		Integer coresArg = Integer.valueOf(args[4]);
-		Integer numSolsArg = Integer.valueOf(args[5]);
+		/*
+		 * Configuration
+		 */
 		
-		// We define the Selevminer instance
-		Integer population = populationArg;
-		Integer generations = generationsArg;
+		String logPath = "";
+		String outPath = "";
+		
+		Integer population = 10;
+		Integer generations = 5;
+		Integer numSolutions = 5;
 		Integer timeout = 20;
-		Integer cores = coresArg;
+		Integer cores = 1;
+
+		/*
+		 * Creating Selevminer Instance
+		 */
 		
 		long start = System.currentTimeMillis();
 		
+		// Here you can customize the algorithms chosen for each stage
 		Selevminer<ProcessModel> selevminer = new Selevminer<ProcessModel>();
 		selevminer.miner = new MINERfulMiner(timeout);
 		selevminer.pmSelector = new RandomPMSelection<ProcessModel>();
@@ -44,20 +49,30 @@ public class Main {
 		selevminer.distanceCalculator = new MINERfulDistanceCalculator();
 		selevminer.evOptimizer = new NSGAIIEvolutionaryOptimizer<ProcessModel>(population, generations, cores);
 
-		selevminer.logPath = Main.class.getClassLoader().getResource(logPath).getFile();
-		selevminer.numSolutions = numSolsArg;	
+		selevminer.logPath = logPath;
+		selevminer.numSolutions = numSolutions;	
+		
+		/*
+		 * Perform discovery
+		 */
 		
 		List<PMWrapper<ProcessModel>> results = selevminer.selevminerDiscovery(MINERfulPMWrapper.class); 
 		
+		/*
+		 * Write results
+		 */
+		
 		long end = System.currentTimeMillis();
 		Long time = Long.valueOf(end - start);
-		
+
+		// Write file with the number of milliseconds that the execution took
 		FileWriter timeFile = new FileWriter(outPath + "/total time.txt");
 		timeFile.write(time.toString());
 		timeFile.close();
 		
 		System.out.println("Process models returned: " + results.size());
-		
+
+		// Write files with a CONDEC, a dot file and the metrics for each model returned by Selevminer
 		Integer i = 1;
 		String folderName = population + "p_" + generations + "g_" + timeout + "t_" + selevminer.numSolutions + "s";
 		String path = outPath + "/" + folderName + "/";
@@ -70,19 +85,17 @@ public class Main {
 		File log = new File(selevminer.logPath);
 		
 		for (PMWrapper<ProcessModel> pm: results) {     
-			((MINERfulMiner) selevminer.miner).saveAsCondec(pm.getPm(log, selevminer.miner), path + "Modelo " + i + "_condec.xml");
+			((MINERfulMiner) selevminer.miner).saveAsCondec(pm.getPm(log, selevminer.miner), path + "Model " + i + "_condec.xml");
 
-			FileWriter writer = new FileWriter(path + "Modelo " + i + "_dot.txt");
+			FileWriter writer = new FileWriter(path + "Model " + i + "_dot.txt");
 			writer.write(((MINERfulPMWrapper)pm).getAutomaton(log, selevminer.miner).toDot());
 			writer.close();
 
-			FileWriter writer2 = new FileWriter(path + "Modelo " + i + "_metricas.txt");
+			FileWriter writer2 = new FileWriter(path + "Model " + i + "_metrics.txt");
 			writer2.write(pm.getMetrics(log, selevminer.miner).toString());
 			writer2.close();
 			
 			i ++;
 		}
-				
-		System.exit(0);
 	}
 }

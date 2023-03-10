@@ -7,11 +7,6 @@ import selevminer.model.PMWrapper;
 
 public class MINERfulDistanceCalculator implements PMDistanceCalculator<ProcessModel> {
 	
-	/* +------------------------+
-	 * |     SCALED DISTANCE    |
-	 * +------------------------+
-	 */
-	
 	// The difference between 2 and 3 is the same as the difference between 200 y 300
 	private Double scaledDifference(Double a, Double b) {
 		return Math.abs((a - b) / Double.max(a, b));

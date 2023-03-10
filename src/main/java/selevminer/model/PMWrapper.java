@@ -7,7 +7,9 @@ import java.util.List;
 import org.uma.jmetal.solution.doublesolution.impl.DefaultDoubleSolution;
 import org.uma.jmetal.util.bounds.Bounds;
 
-// We need a wrapper in order to reuse computed values of process models
+/**
+ * This class allows the caching of intermediate values from the process of discovery.
+ */
 public class PMWrapper<AnyProcessModel> extends DefaultDoubleSolution {
 	
 	private static final long serialVersionUID = 1L;
@@ -23,6 +25,9 @@ public class PMWrapper<AnyProcessModel> extends DefaultDoubleSolution {
 		this.pm = model;
 	}
 
+	/**
+	 * Return the inner Process model and cache its discovery.
+	 */
 	public AnyProcessModel getPm(File log, PMMiner<AnyProcessModel> miner) {
 		if(pm == null) {
 			try {
@@ -39,6 +44,9 @@ public class PMWrapper<AnyProcessModel> extends DefaultDoubleSolution {
 		return pm;
 	}
 
+	/**
+	 * Return the inner model's metrics and cache them in order not to recalculate them.
+	 */
 	public List<Double> getMetrics(File log, PMMiner<AnyProcessModel> miner) {
 		if(pm == null) {
 			this.getPm(log, miner);

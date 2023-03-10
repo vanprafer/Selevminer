@@ -7,14 +7,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/*
+/**
  * Tool that allows the user to execute the Selevminer discovery algorithm
  */
 public class Selevminer<AnyProcessModel> {
 	
 	/* ALGORITHMS */
 	
-	// Evolutionary (multiobjective) optimizer
+	// Evolutionary (multi-objective) optimizer
 	public PMEvolutionaryOptimizer<AnyProcessModel> evOptimizer;
 	// Tool that contains the architecture for the internal discovery algorithm (for example, MINERful)
 	public PMMiner<AnyProcessModel> miner;	
@@ -31,9 +31,11 @@ public class Selevminer<AnyProcessModel> {
 	// Number of clusters desired to obtain. This is translated into the models 
 	public Integer numSolutions = 7;
 	
-	/*
+	/**
 	 * This function combines discovery and evolutionary techniques in order to return a list of the optimal models given some metrics.
-	 * This depends on the mining algorithm you have chosen and its metrics
+	 * This depends on the mining algorithm you have chosen and its metrics.
+	 * @param wrapperClass - Class that is going to be used in order to cache intermediate results for every model. By default, this should be PMWrapper.class.
+	 * @return
 	 */
 	public List<PMWrapper<AnyProcessModel>> selevminerDiscovery(Class<? extends PMWrapper<AnyProcessModel>> wrapperClass) throws Exception {
 		
